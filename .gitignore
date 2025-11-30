@@ -1,0 +1,22 @@
+# Derleme ve geçici dosyalar
+*.log
+*.tmp
+*.swp
+
+# Özel log/kanıt dosyaları
+evidence/*
+!evidence/.gitkeep
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Sistem dosyaları
+.DS_Store
+
+# Editor dosyaları
+.vscode/
+.idea/
+
+# Docker çıktıları
+docker/*.tar
