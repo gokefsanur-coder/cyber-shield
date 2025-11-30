@@ -1,11 +1,20 @@
-# cyber-shield
-Siber Olay Müdahale İstasyonu – Cyber Shield Projesi
-sudo groupadd analysts
-sudo chown root:analysts evidence
-sudo chmod 750 evidence
+# Cyber Shield – Siber Olay Müdahale İstasyonu
 
-sudo setfacl -m g:analysts:r-x evidence
-sudo setfacl -m o::--- evidence
+Bu proje, siber saldırı altındaki bir ortamda delil toplamak ve analiz etmek için hazırlanmış bir “Blue Team – Incident Response” istasyonudur.
 
-sudo setfacl -d -m g:analysts:r-x evidence
-sudo setfacl -d -m o::--- evidence
+Bu dosya, **Hafta 1 – Hazırlık Aşaması** kapsamında yapılan işlemleri içerir.
+
+---
+
+## 📁 1. GitHub Deposu Oluşturuldu
+- Proje adı: **cyber-shield**
+- Açık kaynak lisans: **GPL-3.0**
+- `.gitignore` dosyası oluşturuldu ve gereksiz dosyaların repoya eklenmesi engellendi.
+
+---
+
+## 🔐 2. Delil (evidence) Klasörü Oluşturuldu
+Olay sırasında toplanacak dosyaların güvenli şekilde saklanması için özel bir delil klasörü oluşturuldu:
+
+```bash
+mkdir evidence
