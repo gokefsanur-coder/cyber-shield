@@ -18,3 +18,17 @@ Olay sırasında toplanacak dosyaların güvenli şekilde saklanması için öze
 
 ```bash
 mkdir evidence
+---
+
+## 🔒 3. Delil Klasörüne Katı İzinler Verildi
+
+Delil klasörüne sadece root ve analysts grubunun erişebilmesi için temel izinler ayarlanmıştır:
+
+```bash
+sudo groupadd analysts
+sudo chown root:analysts evidence
+sudo chmod 750 evidence
+sudo setfacl -m g:analysts:rx evidence
+sudo setfacl -m o::--- evidence
+sudo setfacl -d -m g:analysts:rx evidence
+sudo setfacl -d -m o::--- evidence
