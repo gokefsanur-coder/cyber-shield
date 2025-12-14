@@ -32,3 +32,26 @@ sudo setfacl -m g:analysts:rx evidence
 sudo setfacl -m o::--- evidence
 sudo setfacl -d -m g:analysts:rx evidence
 sudo setfacl -d -m o::--- evidence
+---
+
+## Hafta 2 – Analiz (DÖÇ-4 & DÖÇ-5)
+
+### 2.1. Süreç Yönetimi (DÖÇ-4)
+Bu aşamada sistemde çalışan süreçler incelenmiş, CPU ve RAM kullanımına göre sıralama yapılmıştır.  
+`ps aux --sort=-%cpu` ve `ps aux --sort=-%mem` komutları kullanılarak en fazla kaynak tüketen süreçler belirlenmiştir.  
+
+Ayrıca `ps aux | grep 'Z'` komutu ile Zombie process kontrolü gerçekleştirilmiş ve sistemde zombie sürece rastlanmadığı doğrulanmıştır.
+
+---
+
+### 2.2. Metin İşleme ve Log Analizi (DÖÇ-5)
+Web sunucusuna ait `access.log` dosyası üzerinde `awk`, `sed` ve `regex` araçları kullanılarak analiz yapılmıştır.
+
+Bu analiz kapsamında:
+- IP adreslerinin istek sayıları çıkarılmış,
+- 4xx ve 5xx hata kodları filtrelenmiş,
+- IP bazlı hata / saldırı sayıları hesaplanmış,
+- `sed + awk` kullanılarak log satırları sadeleştirilmiştir.
+
+Analiz sonucunda en çok istek yapan IP adresi listenin en başında gösterilmiştir.  
+Tüm işlemler **DÖÇ-4 ve DÖÇ-5** gereksinimlerini karşılamaktadır.
