@@ -67,3 +67,44 @@ Bu depo, projenin kaynak kodlarını, yapılandırma dosyalarını ve güvenlik 
 Kurulum ve Çalıştırma
 Proje Linux tabanlı bir ortamda çalışacak şekilde tasarlanmıştır. Gerekli bağımlılıkların kurulmasının ardından proje dizini klonlanarak servisler ayağa kaldırılabilir.
 git clone https://github.com/sakinealas/cyber-shield.git cd cyber-shield Gerekli dizin yapıları kontrol edilir: /var/www/cyber-shield → Web uygulaması /opt/cyber-shield/evidence → Kritik delil klasörü Yetkili kullanıcı ve gruplar oluşturulur: webadmin → Web dizini yönetimi analysts → Delil analizi yetkisi Dosya ve dizin izinleri ACL ve SGID kullanılarak yapılandırılır: /var/www yalnızca webadmin grubuna açıktır evidence dizini yalnızca analysts grubuna açıktır Default ACL sayesinde yeni dosyalar otomatik olarak korunur Servisler ve betikler (scripts) sistem servisleri üzerinden çalıştırılabilir hale getirilir. ## Lisans Seçimi (GPLv3) Bu projede GNU General Public License v3 (GPLv3) tercih edilmiştir. Bu lisansın seçilme nedeni, projenin ve projeden türetilen çalışmaların açık kaynak olarak kalmasının garanti altına alınmak istenmesidir. GPLv3, yazılımın özgürce kullanılmasına, incelenmesine, değiştirilmesine ve dağıtılmasına izin verirken; türetilen çalışmaların da aynı lisans koşullarıyla paylaşılmasını zorunlu kılar. Bu sayede proje, kapalı kaynaklı hale getirilemez ve açık kaynak felsefesine uygun şekilde sürdürülebilirliği sağlanır. ## Proje Dizin Yapısı ve Güvenlik Tasarımı docker/ Projenin taşınabilir ve izole bir ortamda çalıştırılabilmesi amacıyla Docker yapılandırmaları bu dizin altında tutulmuştur. Bu yaklaşım kurulum bağımlılıklarını azaltmakta ve tekrar edilebilirliği sağlamaktadır. scripts/ Siber olay tespiti ve müdahale süreçlerinde kullanılan tüm Bash script’leri bu dizin altında merkezi olarak toplanmıştır. Script’ler log analizi, sistem izleme ve şüpheli IP yönetimi gibi görevleri yerine getirmektedir. services/ Script’lerin sistem seviyesinde otomatik çalıştırılabilmesi için systemd servis ve zamanlayıcı (timer) dosyaları bu dizinde konumlandırılmıştır. Bu sayede sürekli izleme ve otomasyon sağlanmıştır. evidence/ Olay müdahalesi sürecinde elde edilecek dijital kanıtların saklanması için ayrılmıştır. Klasör bilinçli olarak boş bırakılmış, yalnızca Git tarafından takip edilebilmesi amacıyla .gitkeep dosyası eklenmiştir. Bu yaklaşım delil bütünlüğü prensibine uygundur. .gitignore Log çıktıları ve geçici dosyaların sürüm kontrolüne dahil edilmemesi için yapılandırılmıştır. README.md ve LICENSE Projenin amacı, mimarisi ve kullanım yaklaşımı README dosyasında açıklanmış; açık kaynak lisanslama ile yeniden kullanılabilirlik sağlanmıştır. ## Proje Dizin Yapısı ve Güvenlik Tasarımı Kritik delil klasörleri, olay müdahale senaryosu kapsamında güvenli olacak şekilde yapılandırılmıştır. Evidence dizini root sahipliğinde oluşturulmuş, Access Control List (ACL) kullanılarak yalnızca yetkili analiz grubunun erişimine açılmıştır. Default ACL (setfacl -d) tanımlanarak sonradan oluşturulan dosyaların da otomatik olarak aynı yetkilendirme politikalarıyla korunması sağlanmıştır. ## Kullanıcı / Grup İzolasyonu ve Dosya Yetkilendirme Bu projede web kök dizini olan /var/www/cyber-shield için kullanıcı ve grup bazlı yetkilendirme uygulanmıştır. Dizin sahibi root, grup sahibi ise webadmin olarak yapılandırılmıştır. Dizinde SGID biti etkinleştirilmiş (chmod 2770) ve ACL ile yetkilendirme yapılmıştır. Bu sayede yalnızca webadmin grubuna üye kullanıcılar dizin üzerinde işlem yapabilmektedir. Ayrıca Default ACL (setfacl -d) tanımlanarak, dizin altında oluşturulan yeni dosyaların da otomatik olarak aynı yetkileri miras alması sağlanmıştır. other (yetkisiz) kullanıcılar için tüm erişimler kapatılmıştır. Bu yapılandırma ile En Az Yetki (Least Privilege) ilkesi uygulanmış ve yetkisiz erişim bilinçli olarak engellenmiştir. ## Süreç Yönetimi Bu aşamada sistemde çalışan süreçler incelenmiş, CPU ve RAM kullanımına göre sıralama yapılmıştır. ps aux --sort=-%cpu ve ps aux --sort=-%mem komutları kullanılarak en fazla kaynak tüketen süreçler belirlenmiştir. Ayrıca ps aux | grep 'Z' komutu ile Zombie process kontrolü gerçekleştirilmiş ve herhangi bir anormal sürece rastlanmamıştır. ## Metin İşleme ve Log Analizi Web sunucusuna ait access.log dosyası üzerinde awk, sed ve regex araçlarıyla bir analiz zinciri oluşturulmuştur. Bu analiz kapsamında: Loglardaki IP adreslerinin istek sayıları çıkarılmış, 4xx ve 5xx hata kodları filtrelenmiş, IP bazlı hata/saldırı sayıları hesaplanmış, sed + awk kullanılarak log satırlarından gereksiz bilgiler temizlenmiş ve sade bir çıktı elde edilmiştir.
+
+## 🔐 Hafta 5 – Sistem Sertleştirme (Hardening)
+
+Bu hafta kapsamında sistem güvenliğini artırmaya yönelik aşağıdaki işlemler gerçekleştirilmiştir.
+
+---
+
+### 🧱 Firewall (UFW) Yapılandırması
+- UFW sıfırlanarak temiz bir yapı elde edilmiştir
+- Varsayılan politika **Default Deny (incoming)** olarak ayarlanmıştır
+- Sadece **SSH (22/tcp)** portuna izin verilmiştir
+- Kara listedeki IP adresleri UFW üzerinden engellenmiştir
+
+---
+
+### 🚫 Fail2Ban (SSH Brute Force Koruması)
+- SSH servisi için Fail2Ban aktif edilmiştir
+- Ayarlar:
+  - `maxretry = 3`
+  - `findtime = 10m`
+  - `bantime = 1h`
+- SSH brute-force denemeleri otomatik olarak engellenmektedir
+
+---
+
+### ⏱️ Systemd Timer ile Otomatik Kara Liste
+- `/etc/security/blacklist.txt` dosyasındaki IP’ler okunmaktadır
+- `blocklist.sh` scripti ile IP’ler otomatik olarak UFW’ye eklenmektedir
+- `blocklist.timer` sayesinde script **periyodik** çalışmaktadır
+
+---
+
+### 🐳 Docker Sertleştirme
+- Alpine tabanlı **hafif (slim)** Docker imajı kullanılmıştır
+- Analiz aracı konteyner içinde **izole** çalışmaktadır
+- Loglar volume ile dışarı aktarılmaktadır
+
+```bash
+docker run --rm \
+  -v $(pwd)/logs:/logs \
+  analysis-tool
